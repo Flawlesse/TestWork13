@@ -1,5 +1,4 @@
 from celery import Celery
-import os
 
 
 app = Celery("backend")

@@ -26,6 +26,12 @@ services:
     command: celery -A backend worker --pool=solo --loglevel=INFO
     networks:
       - common
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A backend inspect ping --destination celery@backend"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     depends_on:
       fastapi:
         condition: service_healthy
