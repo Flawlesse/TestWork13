@@ -4,9 +4,11 @@ services:
     container_name: fastapi
     build:
       context: ./backend
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:80"
+    env_file:
+      - .env
     networks:
       - common
     healthcheck:
@@ -23,11 +25,13 @@ services:
     container_name: celery_worker
     build:
       context: ./backend
-    command: celery -A backend worker --pool=solo --loglevel=INFO
+    command: celery -A backend.celery_app worker --pool=solo --loglevel=INFO
+    env_file:
+      - .env
     networks:
       - common
     healthcheck:
-      test: ["CMD-SHELL", "celery -A backend inspect ping --destination celery@backend"]
+      test: ["CMD-SHELL", "celery -A backend.celery_app inspect ping --destination celery@backend"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -46,10 +50,8 @@ services:
       - mongo-data:/data/db
     networks:
       - common
-    ports:
-      - "27017:27017"
     env_file:
-      - ./.env
+      - .env
     restart: unless-stopped
 
   # Just a cool looking web interface for MongoDB
