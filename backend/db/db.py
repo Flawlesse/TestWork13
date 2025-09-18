@@ -3,7 +3,8 @@ from pymongo.asynchronous.client_session import AsyncClientSession
 from pymongo import MongoClient
 from typing import AsyncGenerator
 
-from backend.config import settings
+from config import settings
+from db.validators import quotes_validator
 
 
 CONNECTION_URI = (
@@ -18,10 +19,17 @@ class DBHelper:
         self.async_client = AsyncMongoClient(CONNECTION_URI)
         self.sync_client = MongoClient(CONNECTION_URI)
 
+    def prepare_db(self):
+        """Prepare MongoDB collections and their validation schemes."""
+
+        db = self.sync_client[settings.db_settings.mongo_dbname]
+        db.create_collection("quotes")
+        db.command("collMod", "quotes", validator=quotes_validator)
+
     async def dispose(self) -> None:
         await self.async_client.close()
         self.sync_client.close()
 
     async def session_getter(self) -> AsyncGenerator[AsyncClientSession, None]:
-        async with self.client.start_session() as session:
+        async with self.async_client.start_session() as session:
             yield session

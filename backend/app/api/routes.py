@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from pymongo.asynchronous.client_session import AsyncClientSession
 
-from backend.utils import get_mongodb_async_session
-from backend.celery_tasks import parse_quotes
+from utils import get_mongodb_async_session, logger
+from celery_tasks import parse_quotes
 
 router = APIRouter(
     prefix="/api",
@@ -24,4 +24,5 @@ async def run_quotes_parsing():
 async def get_quotes_route(
     session: Annotated[AsyncClientSession, Depends(get_mongodb_async_session)],
 ):
+    logger.info("Yay I'm TRIGGERED!")
     pass

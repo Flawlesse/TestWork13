@@ -6,7 +6,6 @@ from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = bool(os.environ.get("DEBUG") not in ("false", "False", "0", "f", "F"))
-print(f"{DEBUG=}\n{BASE_DIR=}")
 
 
 class DatabaseSettings(BaseSettings):
